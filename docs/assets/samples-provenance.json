@@ -1,0 +1,50 @@
+[
+  {
+    "id": "idmplus-menu",
+    "case_id": "41",
+    "suite": "longtext-zh",
+    "title": "Chinese chalkboard",
+    "method": "Qwen-Image-2.1 / VGG-MMD",
+    "nfe": 2,
+    "width": 1024,
+    "height": 1024,
+    "png": "idmplus-menu.png",
+    "sha256": "31443bb34aa3390aa10f7587f9b090fa363176c03c4b764c4044af6cdf5baf9d"
+  },
+  {
+    "id": "idmplus-graffiti",
+    "case_id": "Text_Rendering-186",
+    "suite": "oneig",
+    "title": "Text in context",
+    "method": "Qwen-Image-2.1 / VGG-MMD",
+    "nfe": 2,
+    "width": 1024,
+    "height": 1024,
+    "png": "idmplus-graffiti.png",
+    "sha256": "c4234270ddcc6e90f2142aaa91d447b260d4a7efd8543359d346787867282b9b"
+  },
+  {
+    "id": "idmplus-poster",
+    "case_id": "Text_Rendering-184",
+    "suite": "oneig",
+    "title": "Concert poster",
+    "method": "Qwen-Image-2.1 / VGG-MMD",
+    "nfe": 2,
+    "width": 1024,
+    "height": 1024,
+    "png": "idmplus-poster.png",
+    "sha256": "6948950ce05a56de4d00f7e7c99fd5ab7ac2aa6d90ea321e93a52244a6555582"
+  },
+  {
+    "id": "idmplus-portrait",
+    "case_id": "Portrait-183",
+    "suite": "oneig",
+    "title": "Portrait",
+    "method": "Qwen-Image-2.1 / VGG-MMD",
+    "nfe": 2,
+    "width": 1024,
+    "height": 1024,
+    "png": "idmplus-portrait.png",
+    "sha256": "e6787c8428d4fa3759cde5272cf1e9e8d9441d0415daa0b9799564daee9cdc32"
+  }
+]

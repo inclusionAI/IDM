@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f9f5">
+  <title>IDM — Intrinsic Distribution Matching</title>
+  <meta name="description" content="One-step and few-step image generation with internal DMD and moment matching in the generator’s own EMA feature space. An illustrated, bilingual guide to IDM.">
+  <meta property="og:title" content="IDM: Intrinsic Distribution Matching">
+  <meta property="og:description" content="A generator can also supply the representation for distribution matching. Explore the idea, the original equations, and the evidence.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://inclusionai.github.io/IDM/assets/social-cover.png">
+  <meta property="og:url" content="https://inclusionai.github.io/IDM/">
+  <link rel="canonical" href="https://inclusionai.github.io/IDM/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="vendor/katex/katex.min.js"></script>
+  <script defer src="equations.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main"><span lang="en">Skip to content</span><span lang="zh">跳转到正文</span></a>
+<header class="topbar">
+  <a class="wordmark" href="#" aria-label="IDM home">IDM<span class="brand-dot"></span></a>
+  <nav aria-label="Main navigation">
+    <a href="#idea"><span lang="en">The idea</span><span lang="zh">核心原理</span></a>
+    <a href="#moments"><span lang="en">Explore</span><span lang="zh">交互讲解</span></a>
+    <a href="#evidence"><span lang="en">Results</span><span lang="zh">实验结果</span></a>
+    <a href="#citation"><span lang="en">Cite</span><span lang="zh">引用</span></a>
+  </nav>
+  <button id="language" class="language" type="button" aria-label="Switch to Chinese">中文 <span aria-hidden="true">↗</span></button>
+</header>
+<main id="main">
+  <section class="hero container" aria-labelledby="hero-title">
+    <div class="eyebrow"><span class="status-dot"></span> INCLUSION AI <span class="muted">/</span> WESTLAKE UNIVERSITY <span class="year">2026</span></div>
+    <h1 id="hero-title">Intrinsic<br><em>Distribution</em> Matching<span class="title-dot">.</span></h1>
+    <p class="hero-deck"><span lang="en">Better few-step generation, with distributional supervision<br class="desktop"> from the generator itself.</span><span lang="zh">用生成器自身提供分布监督，<br class="desktop">让一步与少步生成保留更多细节。</span></p>
+    <p class="hero-summary"><span lang="en">Internal DMD guides the samples. EMA features align their statistics.<br>One generator, with an explicit constraint across samples.</span><span lang="zh">内部 DMD 引导样本，EMA 特征对齐统计量。<br>在完整 DMD 校正之外，加入显式的跨样本约束。</span></p>
+    <div class="hero-actions">
+      <a class="button primary" href="https://arxiv.org/abs/2610.39633" target="_blank" rel="noopener"><span lang="en">Read the paper</span><span lang="zh">阅读论文</span><span aria-hidden="true">↗</span></a>
+      <a class="button" href="https://github.com/inclusionAI/IDM" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      <a class="button text-button" href="https://huggingface.co/papers/2610.39633" target="_blank" rel="noopener">HF Paper <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="authors">
+      Deyuan Liu<sup>1,2,†</sup> · Yansen Han<sup>2,4,†</sup> · Kaiwen Zheng<sup>3,†</sup> · Jun Xie<sup>1,2,4,5</sup> · Jiacheng Liu<sup>1,6</sup><br>
+      Zhenglin Cheng<sup>1,2,4,5</sup> · Peng Sun<sup>1,2,4</sup> · Jintao Zhang<sup>3,*</sup> · Jianguo Li<sup>1,*</sup> · Tao Lin<sup>1,2,*</sup>
+      <details class="affiliations"><summary><span lang="en">Affiliations & contributions</span><span lang="zh">单位与作者贡献</span></summary><p><sup>1</sup> Inclusion AI · <sup>2</sup> Westlake University · <sup>3</sup> Tsinghua University<br><sup>4</sup> Zhejiang University · <sup>5</sup> Shanghai Innovation Institute · <sup>6</sup> MBZUAI<br><span lang="en">† Equal contribution. * Corresponding authors.</span><span lang="zh">† 共同贡献。* 通讯作者。</span></p></details>
+    </div>
+    <div class="hero-gallery">
+      <figure><button class="sample-button" type="button" data-image="assets/idmplus-menu.png" aria-label="Enlarge IDM sample"><img src="assets/idmplus-menu.webp" width="1024" height="1024" alt="IDM sample"></button><figcaption>01 <span lang="en">Chinese text</span><span lang="zh">中文文字</span></figcaption></figure>
+      <figure><button class="sample-button" type="button" data-image="assets/idmplus-graffiti.png" aria-label="Enlarge IDM sample"><img src="assets/idmplus-graffiti.webp" width="1024" height="1024" alt="IDM sample"></button><figcaption>02 <span lang="en">Text in context</span><span lang="zh">场景中的文字</span></figcaption></figure>
+      <figure><button class="sample-button" type="button" data-image="assets/idmplus-poster.png" aria-label="Enlarge IDM sample"><img src="assets/idmplus-poster.webp" width="1024" height="1024" alt="IDM sample"></button><figcaption>03 <span lang="en">Typography</span><span lang="zh">文字排版</span></figcaption></figure>
+      <figure><button class="sample-button" type="button" data-image="assets/idmplus-portrait.png" aria-label="Enlarge IDM sample"><img src="assets/idmplus-portrait.webp" width="1024" height="1024" alt="IDM sample"></button><figcaption>04 <span lang="en">Portraits</span><span lang="zh">人像</span></figcaption></figure>
+    </div>
+    <p class="figure-note"><span lang="en">IDM samples.</span><span lang="zh">IDM 采样。</span></p>
+    <div class="hero-metrics">
+      <div><span class="metric-value">94.25<span>%</span></span><span class="metric-label">LongText-CN</span></div>
+      <div><span class="metric-value">90.20<span>%</span></span><span class="metric-label">LongText-EN</span></div>
+      <div class="metric-context"><strong>2 NFE</strong><span lang="en">Z-Image · Best among the compared methods<br>at this network-evaluation budget.</span><span lang="zh">Z-Image · 在相同网络评估预算下，<br>取得对比方法中的最佳成绩。</span></div>
+    </div>
+  </section>
+
+  <section id="idea" class="section container">
+    <div class="section-kicker">01 <span lang="en">THE CENTRAL IDEA</span><span lang="zh">核心思路</span></div>
+    <div class="section-heading"><h2><span lang="en">The generator can<br>also be the representation.</span><span lang="zh">生成器，<br>也可以提供表征。</span></h2><p><span lang="en">IDM augments internal DMD with feature-moment matching. Its EMA copy supplies a shared feature space for generated and reference samples.</span><span lang="zh">IDM 在内部 DMD 之上加入特征矩匹配。生成器的 EMA 副本为生成样本和参考样本提供共同的特征空间。</span></p></div>
+    <div class="objective-panel">
+      <span class="micro-label"><span lang="en">THE TRAINING OBJECTIVE</span><span lang="zh">训练目标</span> · <span class="eq-source">Eq. 14</span></span>
+      <div class="math-display" data-equation="eq:l_idm"></div>
+      <p class="formula-hint"><span lang="en">Swipe horizontally to read long equations →</span><span lang="zh">长公式可横向滑动查看 →</span></p>
+      <div class="objective-legend">
+        <div><span class="math" data-tex="\cL_{\text{base}}"></span><p><span lang="en">RCGM base objective</span><span lang="zh">RCGM 基础目标</span></p></div>
+        <div><span class="math" data-tex="\cL_{\text{score}}"></span><p><span lang="en">Full internal DMD correction</span><span lang="zh">完整的内部 DMD 校正</span></p></div>
+        <div><span class="math" data-tex="\widehat{\cL}_{\text{pop}}"></span><p><span lang="en">Empirical EMA feature-moment loss</span><span lang="zh">EMA 特征矩的经验损失</span></p></div>
+      </div>
+    </div>
+
+    <div class="walkthrough">
+      <div class="step-tabs" role="tablist" aria-label="Method walkthrough">
+        <button id="tab-dmd" role="tab" aria-selected="true" aria-controls="panel-dmd" data-step="dmd"><span>01</span> DMD</button>
+        <button id="tab-internal" role="tab" aria-selected="false" aria-controls="panel-internal" tabindex="-1" data-step="internal"><span>02</span> <span lang="en">Internal DMD</span><span lang="zh">内部 DMD</span></button>
+        <button id="tab-idm" role="tab" aria-selected="false" aria-controls="panel-idm" tabindex="-1" data-step="idm"><span>03</span> IDM</button>
+      </div>
+      <div id="panel-dmd" class="step-panel" role="tabpanel" aria-labelledby="tab-dmd">
+        <div class="step-copy"><h3><span lang="en">Start with a score difference.</span><span lang="zh">从两个分布的 score 差出发。</span></h3><p><span lang="en">A score points toward increasing log density. DMD uses the difference between the reference and generated scores to guide samples toward a lower model-to-reference density ratio.</span><span lang="zh">Score 指向对数密度增加的方向。DMD 使用参考分布与生成分布的 score 差，引导样本朝模型与参考密度比降低的方向移动。</span></p><p><span lang="en">Classical DMD uses a pretrained teacher for the reference score and learns a separate fake-score network for the changing generated distribution.</span><span lang="zh">经典 DMD 用预训练教师提供参考 score，并训练独立的 fake-score 网络来跟踪不断变化的生成分布。</span></p><a class="inline-link" href="https://arxiv.org/abs/2610.39633" target="_blank" rel="noopener"><span lang="en">Paper §2–3</span><span lang="zh">论文第2–3节</span> ↗</a></div>
+        <div class="step-visual"><span class="micro-label"><span lang="en">REVERSE-KL FIELD</span><span lang="zh">反向 KL 场</span> · Eq. 3</span><div class="math-display" data-equation="eq:reverse_kl_field"></div><div class="direction"><span lang="en">Descent direction</span><span lang="zh">下降方向</span><span class="math" data-tex="-\gv_{\mathrm{KL}}=\ss_r-\ss_\theta"></span><span class="arrow-long" aria-hidden="true">⟶</span></div><p class="subtle"><span lang="en">The sign matters: the field is model minus reference; descent uses its negative.</span><span lang="zh">注意正负号：场是“模型减参考”，下降方向取它的负值。</span></p></div>
+      </div>
+      <div id="panel-internal" class="step-panel" role="tabpanel" aria-labelledby="tab-internal" hidden>
+        <div class="step-copy"><h3><span lang="en">Keep score learning inside.</span><span lang="zh">把 score 学习放回生成器内部。</span></h3><p><span lang="en">Following APEX, the same network uses opposite condition vectors to select its reference and model velocity branches. Their difference estimates the DMD correction without a separate fake-score network.</span><span lang="zh">沿用 APEX，同一网络用相反的条件向量区分参考速度分支和模型速度分支。两者之差提供 DMD 校正的估计，无需独立的 fake-score 网络。</span></p><p class="subtle"><span lang="en">The model-score estimate is still learned. Here −c selects the model branch for the same condition c.</span><span lang="zh">模型 score 仍然需要学习。这里的 −c 是同一条件 c 对应的模型分支选择方式。</span></p></div>
+        <div class="step-visual"><span class="micro-label"><span lang="en">ONE NETWORK, TWO BRANCHES</span><span lang="zh">同一网络，两个分支</span> · Eq. 10</span><div class="branch-diagram"><span class="math branch-core" data-tex="\mmF_\theta"></span><span class="math" data-tex="+\cc\;\longrightarrow\;\widehat\vv_{r,t}"></span><span class="math" data-tex="-\cc\;\longrightarrow\;\widehat\vv_{\theta,t}"></span></div><div class="math-display compact" data-equation="eq:branch_instantiation"></div><p class="subtle"><span lang="en">The interpretation assumes both branches approximate their marginal velocities.</span><span lang="zh">这一解释以两个分支能近似相应边缘速度为前提。</span></p></div>
+      </div>
+      <div id="panel-idm" class="step-panel" role="tabpanel" aria-labelledby="tab-idm" hidden>
+        <div class="step-copy"><h3><span lang="en">Add an explicit statistical constraint.</span><span lang="zh">再加一个显式统计约束。</span></h3><p><span lang="en">IDM keeps the full DMD correction and compares pooled feature statistics across generated and reference samples. The generator’s EMA copy supplies those features.</span><span lang="zh">IDM 保留完整 DMD 校正，并比较生成样本与参考样本的汇总特征统计量。这些特征由生成器自身的 EMA 副本提供。</span></p><p><span lang="en">Within an update, EMA parameters are fixed; gradients still pass through the feature network to current generated samples.</span><span lang="zh">单次更新中，EMA 参数固定；梯度仍可经过特征网络传回当前生成样本。</span></p></div>
+        <div class="step-visual"><span class="micro-label"><span lang="en">THE GENERATOR’S OWN FEATURE SPACE</span><span lang="zh">生成器自身的特征空间</span></span><div class="feature-flow"><div><span class="math" data-tex="\xx_\theta"></span><span lang="en">Generated</span><span lang="zh">生成样本</span></div><span aria-hidden="true">→</span><div class="flow-emphasis"><span class="math" data-tex="\phi_{\bar\theta}"></span><span>EMA</span></div><span aria-hidden="true">→</span><div><span class="math" data-tex="\mu_\theta^\phi,\;\nu_\theta^\phi"></span><span lang="en">Moments</span><span lang="zh">特征矩</span></div></div><div class="feature-flow"><div><span class="math" data-tex="\xx_r"></span><span lang="en">Reference</span><span lang="zh">参考样本</span></div><span aria-hidden="true">→</span><div class="flow-emphasis"><span class="math" data-tex="\phi_{\bar\theta}"></span><span>EMA</span></div><span aria-hidden="true">→</span><div><span class="math" data-tex="\mu_r^\phi,\;\nu_r^\phi"></span><span lang="en">Moments</span><span lang="zh">特征矩</span></div></div><p class="subtle"><span lang="en">The same representation is used on both sides; no external feature encoder is needed.</span><span lang="zh">两侧使用同一表征，无需外部特征编码器。</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="decomposition" class="section tinted">
+    <div class="container">
+      <div class="section-kicker">02 <span lang="en">WHY MOMENTS?</span><span lang="zh">为什么约束矩？</span></div>
+      <div class="section-heading"><h2><span lang="en">A full field.<br>Two components.</span><span lang="zh">完整的场，<br>两部分结构。</span></h2><p><span lang="en">DMD already contains moment information. The decomposition reveals a part determined by means and covariances—and what remains beyond it.</span><span lang="zh">DMD 本身已经包含矩信息。分解揭示了由均值、协方差决定的部分，以及它们之外仍然存在的 score 结构。</span></p></div>
+      <div class="equation-surface"><span class="micro-label">Eq. 7 · <span lang="en">EXACT DECOMPOSITION, AT FIXED CONDITION</span><span lang="zh">固定条件下的精确分解</span></span><div class="math-display" data-equation="eq:grad_decomp_main"></div></div>
+      <div class="two-notes"><article><span class="math note-symbol" data-tex="\gv_{\mathrm{KL}}^{\mathrm{G}}"></span><h3><span lang="en">Means and covariances</span><span lang="zh">均值与协方差</span></h3><p><span lang="en">The difference between the scores of moment-matched Gaussians. If both moments match in the same coordinate space, this component vanishes.</span><span lang="zh">由矩匹配高斯的 score 差构成。在同一坐标空间中，均值和协方差相同，这一分量就消失。</span></p></article><article><span class="math note-symbol" data-tex="\gv_{\mathrm{KL}}^{\mathrm{nG}}"></span><h3><span lang="en">Non-Gaussian residual</span><span lang="zh">非高斯残差</span></h3><p><span lang="en">The remaining score structure. Equal means and covariances do not guarantee equal distributions, so the residual can still be nonzero.</span><span lang="zh">高斯近似之外的 score 结构。均值和协方差一致并不保证两个分布一致，因此残差仍可能非零。</span></p></article></div>
+      <button class="image-button diagram-figure" type="button" data-image="assets/decomposition.webp" aria-label="Enlarge original paper Figure 3"><img loading="lazy" src="assets/decomposition.webp" alt="Original Figure 3: reverse-KL field, Gaussian moment component, and non-Gaussian residual" width="2400" height="823"><span class="zoom-label"><span lang="en">Paper Fig. 3 · Click to enlarge</span><span lang="zh">论文 Figure 3 · 点击放大</span> ↗</span></button>
+      <div class="key-message"><span class="quote-mark" aria-hidden="true">↳</span><p><span lang="en">IDM keeps the <strong>full DMD correction</strong> and adds a <strong>feature-space moment loss</strong>. The added loss is motivated by this decomposition; it does not estimate the sample-space Gaussian or residual component.</span><span lang="zh">IDM 保留<strong>完整 DMD 校正</strong>，再加入<strong>特征空间的矩损失</strong>。分解为该约束提供动机，但新增损失并不估计样本空间中的高斯分量或残差分量。</span></p></div>
+      <details class="technical"><summary><span lang="en">The score decomposition behind Eq. 7</span><span lang="zh">展开 Eq. 7 背后的 score 分解</span><span aria-hidden="true">+</span></summary><div class="technical-body"><p><span lang="en">For a smooth positive density with finite second moment and positive-definite covariance, its moment-matched Gaussian is</span><span lang="zh">对具有有限二阶矩、正定协方差的光滑正密度，其矩匹配高斯为</span> <span class="math" data-tex="q_p:=\cN(\mu_p,\Sigma_p)"></span>.</p><div class="math-display" data-equation="eq:score_decomp_main"></div><p><span lang="en">The Gaussian is an analytical approximation to the score; generated samples are not assumed to be Gaussian. Each residual is orthogonal to constant and linear functions under its own distribution, under the paper’s regularity conditions. The difference of two residuals need not inherit that orthogonality.</span><span lang="zh">高斯用于分析 score，并不假设生成样本服从高斯分布。在原文正则条件下，每个残差在自身分布下与常数及线性函数正交；两个残差之差不必继承这一正交性。</span></p></div></details>
+    </div>
+  </section>
+
+  <section id="moments" class="section container">
+    <div class="section-kicker">03 <span lang="en">EXPLORE THE CONSTRAINT</span><span lang="zh">交互理解矩约束</span></div>
+    <div class="section-heading"><h2><span lang="en">Move the mean.<br>Match the spread.</span><span lang="zh">对齐均值，<br>再对齐离散程度。</span></h2><p><span lang="en">The mean term adjusts the feature average. The standard-deviation term adjusts the spread around that average. Try both below.</span><span lang="zh">均值项约束特征的平均位置，标准差项约束围绕均值的离散程度。可以在下方分别调整，观察损失如何变化。</span></p></div>
+    <div class="equation-surface moment-equation"><span class="micro-label"><span lang="en">POPULATION FEATURE-MOMENT LOSS</span><span lang="zh">总体特征矩损失</span> · Eq. 13</span><div class="math-display" data-equation="eq:moment_loss"></div></div>
+    <div class="moment-lab">
+      <div class="plot-area"><div class="plot-top"><span class="micro-label"><span lang="en">ONE FEATURE DIMENSION</span><span lang="zh">单维特征示意</span> <span class="math" data-tex="d_\phi=1"></span></span><div class="legend"><span><i class="swatch reference"></i><span lang="en">Reference</span><span lang="zh">参考</span></span><span><i class="swatch generated"></i><span lang="en">Generated</span><span lang="zh">生成</span></span></div></div><svg id="moment-plot" viewBox="0 0 620 340" role="img" aria-label="Interactive density curves of one-dimensional Gaussian feature proxies"><g id="plot-grid"></g><path id="reference-area"></path><path id="generated-area"></path><path id="reference-curve"></path><path id="generated-curve"></path><line id="mean-marker" y1="35" y2="290"></line><text id="density-label" x="20" y="22">Density</text><text id="feature-label" x="310" y="334" text-anchor="middle">Feature value</text></svg><p class="plot-caption"><span lang="en">Illustrative Gaussian proxies, not measured feature distributions or image samples. Reference mean = 0, standard deviation = 1.</span><span lang="zh">曲线仅示意高斯近似，并非实测特征分布或图像样本。参考均值为0，标准差为1。</span></p></div>
+      <div class="plot-controls">
+        <label for="mean-control"><span class="math" data-tex="\mu_\theta^\phi"></span><span lang="en">Mean</span><span lang="zh">均值</span><output id="mean-value">1.40</output></label><input id="mean-control" type="range" min="-2.5" max="2.5" step="0.05" value="1.4">
+        <label for="spread-control"><span class="math" data-tex="\sqrt{\nu_{\theta,1}^\phi}"></span><span lang="en">Standard deviation</span><span lang="zh">标准差</span><output id="spread-value">1.60</output></label><input id="spread-control" type="range" min="0.35" max="2" step="0.05" value="1.6">
+        <div class="loss-readout"><span class="math" data-tex="\cL_{\text{pop}}"></span><output id="loss-value" aria-live="polite">2.32</output></div>
+        <div class="loss-parts"><span><span lang="en">Mean term</span><span lang="zh">均值项</span> <b id="mean-loss">1.96</b></span><span><span lang="en">Spread term</span><span lang="zh">标准差项</span> <b id="spread-loss">0.36</b></span></div>
+        <button class="button primary" id="match-moments" type="button"><span lang="en">Match the moments</span><span lang="zh">对齐这两个矩</span><span aria-hidden="true">↗</span></button>
+        <button class="reset-button" id="reset-moments" type="button"><span lang="en">Reset example</span><span lang="zh">重置示例</span></button>
+      </div>
+    </div>
+    <p class="important-note"><span lang="en">These moments pool across conditions. Matching them does not mean matching every conditional distribution—or the entire feature distribution.</span><span lang="zh">这些统计量跨条件汇总。对齐它们，不等于逐个匹配条件分布，也不等于匹配完整特征分布。</span></p>
+    <div class="training-notes"><article><span class="mini-index">A</span><h3><span lang="en">Where do the features come from?</span><span lang="zh">特征从哪里来？</span></h3><p><span class="math" data-tex="\phi_{\bar\theta}"></span><span lang="en"> mean-pools the EMA generator’s last-layer activations at high noise levels. Generated and reference samples use the same feature map.</span><span lang="zh"> 对高噪声下 EMA 生成器的最后一层激活做均值池化。生成样本与参考样本使用同一个特征映射。</span></p></article><article><span class="mini-index">B</span><h3><span lang="en">Where do gradients go?</span><span lang="zh">梯度传到哪里？</span></h3><p><span lang="en">Current generated features retain gradients. EMA parameters and queued features are fixed within an update. The empirical loss is </span><span lang="zh">当前生成特征保留梯度；单次更新中，EMA 参数及队列特征固定。实际使用的经验损失为 </span><span class="math" data-tex="\widehat{\cL}_{\text{pop}}"></span>.</p></article><article><span class="mini-index">C</span><h3><span lang="en">What remains at inference?</span><span lang="zh">推理时需要什么？</span></h3><p><span lang="en">The learned generator, text encoder, and VAE. Feature extraction, feature queues, and moment computation are used only during training.</span><span lang="zh">训练后的生成器、文本编码器和 VAE。额外特征提取、特征队列与矩计算只用于训练。</span></p></article></div>
+    <details class="technical"><summary><span lang="en">How velocity and endpoint regression use the same DMD correction</span><span lang="zh">速度与端点回归如何使用同一 DMD 校正</span><span aria-hidden="true">+</span></summary><div class="technical-body"><p><span lang="en">With the paper’s convention, t = 1 is noise and t = 0 is data. The exact marginal velocity difference corresponds to the descent direction of the noisy reverse KL:</span><span lang="zh">沿用原文约定，t = 1 为噪声，t = 0 为数据。精确边缘速度之差对应噪声分布反向 KL 的下降方向：</span></p><div class="math-display" data-equation="eq:d_micro"></div><p><span lang="en">The processed correction is detached and constructs both targets (sg denotes stop-gradient):</span><span lang="zh">经过处理的校正被停止梯度，并用于构造两个目标（sg 表示停止梯度）：</span></p><div class="math-display" data-equation="eq:dmd_targets"></div><div class="math-display" data-equation="eq:l_score"></div><p><span lang="en">At fixed input and time, </span><span lang="zh">在固定输入与时间下，</span><span class="math" data-tex="\ell_x(t)=t^2\ell_v(t)"></span><span lang="en">. The two regressions change time weighting and magnitude; they are not independent distributional signals. Equal weighting is selected empirically by the ablations.</span><span lang="zh">。两种回归改变时间权重与梯度大小，并非独立的分布信号。等权配置由消融实验选择。</span></p></div></details>
+  </section>
+
+  <section id="evidence" class="section evidence-section"><div class="container">
+    <div class="section-kicker">04 <span lang="en">THE EVIDENCE</span><span lang="zh">实验依据</span></div>
+    <div class="section-heading"><h2><span lang="en">What does the<br>added constraint buy?</span><span lang="zh">新增的约束，<br>究竟带来多少收益？</span></h2><p><span lang="en">First isolate the added moment loss under a shared training setting. Then look at the broader text-rendering comparison.</span><span lang="zh">先在相同训练配置下看新增矩损失的贡献，再看更广泛的文本渲染对比。</span></p></div>
+    <div class="table-scroll"><table class="results-table"><caption><span lang="en">Controlled ablations · IDM (Z-Image), full tuning, 2 NFE · Paper Table 5</span><span lang="zh">受控消融 · IDM（Z-Image），全参数训练，2 NFE · 论文 Table 5</span></caption><thead><tr><th scope="col"><span lang="en">Configuration</span><span lang="zh">配置</span></th><th scope="col">OneIG</th><th scope="col">GenEval</th><th scope="col">DPG-Bench</th><th scope="col">LongText-CN</th><th scope="col">LongText-EN</th></tr></thead><tbody><tr><th scope="row"><span lang="en">Internal DMD, without moment loss</span><span lang="zh">内部 DMD，不加矩损失</span></th><td>52.87</td><td>77.46</td><td>86.54</td><td>93.87</td><td>89.79</td></tr><tr><th scope="row"><span lang="en">DMD + moment loss, DINOv2 features</span><span lang="zh">DMD + 矩损失，DINOv2 特征</span></th><td>53.00</td><td>77.75</td><td>86.71</td><td>94.13</td><td>90.09</td></tr><tr class="ours"><th scope="row"><span lang="en">IDM · generator EMA features</span><span lang="zh">IDM · 生成器 EMA 特征</span></th><td>53.06</td><td>77.81</td><td>86.82</td><td>94.25</td><td>90.20</td></tr><tr class="gain"><th scope="row"><span lang="en">Gain over internal DMD control</span><span lang="zh">相对内部 DMD 控制组的提升</span></th><td>+0.19</td><td>+0.35</td><td>+0.28</td><td>+0.38</td><td>+0.41</td></tr></tbody></table></div>
+    <p class="figure-note"><span lang="en">Scores are percentages; gains are percentage points. All five reported aggregate metrics improve. EMA features perform close to DINOv2 without requiring an external encoder.</span><span lang="zh">分数为百分比，增量单位为百分点。五项汇总指标均有提升；EMA 特征效果接近 DINOv2，且无需外部编码器。</span></p>
+    <div class="benchmark-panel"><div class="benchmark-intro"><span class="micro-label"><span lang="en">LONG-TEXT RENDERING · 2 NFE</span><span lang="zh">长文本渲染 · 2 NFE</span></span><h3><span lang="en">Dense text.<br>In two evaluations.</span><span lang="zh">两次网络评估，<br>生成密集文本。</span></h3><p><span lang="en">External methods use their respective training data and configurations. This comparison complements the controlled ablation above.</span><span lang="zh">外部方法各自使用不同的训练数据和配置。该比较补充展示整体效果，与上方受控消融分别解读。</span></p><div class="segmented" role="group" aria-label="Text-rendering benchmark"><button data-benchmark="cn" aria-pressed="true">LongText-CN</button><button data-benchmark="en" aria-pressed="false">LongText-EN</button></div></div><div class="bars-container"><div class="chart-axis"><span lang="en">Score (%) ↑</span><span lang="zh">分数（%）↑</span><span>0 — 100</span></div><div id="benchmark-bars"></div></div></div>
+    <button class="image-button results-image" type="button" data-image="assets/ablation.webp" aria-label="Enlarge qualitative loss comparison from paper Figure 5"><img loading="lazy" src="assets/ablation.webp" alt="Paper Figure 5 compares reference methods and IDM loss configurations on a sushi poster and a bilingual coffee menu" width="2500" height="1516"><span class="zoom-label"><span lang="en">Paper Fig. 5 · Click to inspect the text</span><span lang="zh">论文 Figure 5 · 点击查看文字细节</span> ↗</span></button>
+    <p class="figure-note"><span lang="en">Qualitative examples show more consistent dense-text preservation with full IDM. The v+x control omits the moment loss and produces more saturated colors in parts of the sushi poster. APEX is an external reference, not a controlled stage of the same training run.</span><span lang="zh">定性样例中，完整 IDM 对密集文本的保留更稳定。不含矩损失的 v+x 控制组在寿司海报部分区域颜色更饱和。APEX 是外部参照，不是同一次训练的受控阶段。</span></p>
+    <div class="backbone-line"><span lang="en">Evaluated with full-parameter & LoRA tuning</span><span lang="zh">支持全参数与 LoRA 训练评估</span><strong>Z-Image-Turbo <span>6B</span></strong><strong>Qwen-Image <span>20B</span></strong></div>
+  </div></section>
+
+  <section id="notation" class="section container notation-section">
+    <div class="section-kicker">05 <span lang="en">READ THE SYMBOLS</span><span lang="zh">符号速查</span></div>
+    <div class="section-heading"><h2><span lang="en">The paper’s notation.<br>Kept intact.</span><span lang="zh">沿用原文符号，<br>把每一项说清楚。</span></h2><p><span lang="en">Equation numbers refer to the original manuscript. A star denotes an exact marginal quantity; a hat denotes a learned or empirical estimate.</span><span lang="zh">公式编号对应原文。星号表示精确边缘量，帽子表示学习得到或经验估计的量。</span></p></div>
+    <dl class="notation-grid">
+      <div><dt class="math" data-tex="p_r,\;p_\theta"></dt><dd><span lang="en">Reference and generated distributions</span><span lang="zh">参考分布与生成分布</span></dd></div>
+      <div><dt class="math" data-tex="\xx,\;\cc,\;\zz"></dt><dd><span lang="en">Sample, text condition, and Gaussian noise</span><span lang="zh">样本、文本条件与高斯噪声</span></dd></div>
+      <div><dt class="math" data-tex="\mmF_\theta,\;G_\theta"></dt><dd><span lang="en">Velocity network and one-step generator</span><span lang="zh">速度网络与一步生成器</span></dd></div>
+      <div><dt class="math" data-tex="\ss_i,\;\gv_{\mathrm{KL}}"></dt><dd><span lang="en">Score and reverse-KL field</span><span lang="zh">Score 与反向 KL 场</span></dd></div>
+      <div><dt class="math" data-tex="q_i,\;\boldsymbol{\eta}_i"></dt><dd><span lang="en">Moment-matched Gaussian and score residual</span><span lang="zh">矩匹配高斯与 score 残差</span></dd></div>
+      <div><dt class="math" data-tex="\phi_{\bar\theta},\;\hh_i"></dt><dd><span lang="en">EMA feature map and extracted feature</span><span lang="zh">EMA 特征映射与提取的特征</span></dd></div>
+      <div><dt class="math" data-tex="\mu_i^\phi,\;\nu_{i,j}^\phi"></dt><dd><span lang="en">Pooled feature mean and coordinate variance</span><span lang="zh">汇总特征均值与逐坐标方差</span></dd></div>
+      <div><dt class="math" data-tex="\cQ_\theta,\;\cQ_r"></dt><dd><span lang="en">Detached model and reference feature queues</span><span lang="zh">已停止梯度的模型与参考特征队列</span></dd></div>
+    </dl>
+    <div class="notation-foot"><span class="math" data-tex="G_\theta(\zz,\cc)=\zz-\mmF_\theta(\zz,1,\cc)"></span><span lang="en">One-step generation · t = 1 → t = 0</span><span lang="zh">一步生成 · t = 1 → t = 0</span></div>
+  </section>
+
+  <section id="citation" class="section citation-section"><div class="container citation-layout"><div><div class="section-kicker">06 <span lang="en">BUILD ON THE WORK</span><span lang="zh">引用与代码</span></div><h2><span lang="en">Intrinsic by design.<br>Open to explore.</span><span lang="zh">从内部出发，<br>欢迎继续探索。</span></h2><p><span lang="en">If you use this work or its inference code, please cite IDM and APEX.</span><span lang="zh">如果这项工作或推理代码对你有所帮助，欢迎引用 IDM 和 APEX。</span></p><a class="button primary" href="https://github.com/inclusionAI/IDM" target="_blank" rel="noopener"><span lang="en">Explore the code</span><span lang="zh">查看代码仓库</span> ↗</a><p class="weight-status"><span class="status-dot"></span><span lang="en">Model weights: coming soon</span><span lang="zh">模型权重：Coming soon</span></p></div><div class="citation-box"><div class="citation-toolbar"><span>BibTeX · IDM + APEX</span><button id="copy-citation" type="button"><span lang="en">Copy</span><span lang="zh">复制</span> <span aria-hidden="true">↗</span></button></div><pre><code id="bibtex"></code></pre><span id="copy-status" class="sr-only" role="status"></span></div></div></section>
+</main>
+<footer class="container footer"><a class="wordmark" href="#">IDM<span class="brand-dot"></span></a><p>Intrinsic Distribution Matching · 2026<br><span lang="en">An illustrated guide to the original paper.</span><span lang="zh">依据原始论文制作的交互讲解。</span></p><a href="https://arxiv.org/abs/2610.39633" target="_blank" rel="noopener">arXiv:2610.39633 ↗</a></footer>
+<dialog id="image-dialog"><button id="close-image" type="button" aria-label="Close enlarged image">×</button><img id="expanded-image" alt=""><p id="expanded-caption"></p></dialog>
+</body>
+</html>
